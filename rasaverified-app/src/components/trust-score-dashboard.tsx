@@ -2,7 +2,13 @@
 
 import { motion } from 'framer-motion';
 import { ShieldCheck, ShieldAlert, ShieldX, AlertTriangle, TrendingUp } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import type { Doc } from '../../convex/_generated/dataModel';
+
+const TrustSphere = dynamic(
+  () => import('@/components/trust-sphere').then((mod) => mod.TrustSphere),
+  { ssr: false, loading: () => null },
+);
 
 interface TrustScoreDashboardProps {
   trustScore: Doc<"trust_scores">;
@@ -133,16 +139,21 @@ export function TrustScoreDashboard({ trustScore }: TrustScoreDashboardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`rounded-2xl border ${config.bg} backdrop-blur-md p-6 shadow-lg ${config.glowColor}`}
+      className={`relative overflow-hidden rounded-2xl border ${config.bg} backdrop-blur-md p-6 shadow-lg ${config.glowColor}`}
     >
+      {/* 3D sphere background */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none">
+        <TrustSphere score={trustScore.overallScore} verdict={trustScore.verdict} />
+      </div>
+
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
+      <div className="relative z-10 flex items-center gap-3 mb-6">
         <TrendingUp className="w-5 h-5 text-gray-400" />
         <h2 className="text-xl font-semibold text-white">Trust Score Analysis</h2>
       </div>
 
       {/* Overall score ring + verdict */}
-      <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
+      <div className="relative z-10 flex flex-col sm:flex-row items-center gap-6 mb-8">
         <ScoreRing score={trustScore.overallScore} />
         <div className="text-center sm:text-left">
           <div className={`flex items-center gap-2 ${config.color}`}>
@@ -159,7 +170,7 @@ export function TrustScoreDashboard({ trustScore }: TrustScoreDashboardProps) {
       </div>
 
       {/* Sub-score breakdown */}
-      <div className="space-y-4">
+      <div className="relative z-10 space-y-4">
         <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider">
           Score Breakdown
         </h3>
@@ -175,7 +186,7 @@ export function TrustScoreDashboard({ trustScore }: TrustScoreDashboardProps) {
 
       {/* Flags */}
       {trustScore.flags.length > 0 && (
-        <div className="mt-6 space-y-2">
+        <div className="relative z-10 mt-6 space-y-2">
           <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-amber-400" />
             Suspicion Flags

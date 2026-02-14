@@ -8,13 +8,7 @@ import { ReviewList } from '@/components/review-list';
 import { motion } from 'framer-motion';
 import { ArrowLeft, MapPin, Utensils, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import type { Id } from '../../../../convex/_generated/dataModel';
-
-const TrustSphere = dynamic(
-  () => import('@/components/trust-sphere').then((mod) => mod.TrustSphere),
-  { ssr: false, loading: () => <div className="h-[300px]" /> },
-);
 
 export default function RestaurantDetailPage() {
   const params = useParams();
@@ -104,18 +98,6 @@ export default function RestaurantDetailPage() {
         <div className="grid gap-8 lg:grid-cols-5">
           {/* Trust score dashboard (wider) */}
           <div className="lg:col-span-3 space-y-6">
-            {/* 3D Trust Sphere */}
-            {trustScore && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6 }}
-                className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md overflow-hidden"
-              >
-                <TrustSphere score={trustScore.overallScore} verdict={trustScore.verdict} />
-              </motion.div>
-            )}
-
             {trustScore ? (
               <TrustScoreDashboard trustScore={trustScore} />
             ) : trustScore === undefined ? (
