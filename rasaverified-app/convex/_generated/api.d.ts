@@ -8,6 +8,8 @@
  * @module
  */
 
+import type * as auth from "../auth.js";
+import type * as community from "../community.js";
 import type * as restaurants from "../restaurants.js";
 import type * as scoring from "../scoring.js";
 import type * as seed from "../seed.js";
@@ -19,6 +21,8 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  auth: typeof auth;
+  community: typeof community;
   restaurants: typeof restaurants;
   scoring: typeof scoring;
   seed: typeof seed;

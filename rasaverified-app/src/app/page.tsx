@@ -4,10 +4,14 @@ import { useState, useCallback } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { SearchBar } from '@/components/search-bar';
+import { SearchFilters } from '@/components/search-filters';
 import { RestaurantCard } from '@/components/restaurant-card';
 import { ShieldCheck, Sparkles, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { Doc, Id } from '../../convex/_generated/dataModel';
+
+type HalalFilter = "halal" | "non-halal" | "unknown" | undefined;
+type PriceFilter = "$" | "$$" | "$$$" | "$$$$" | undefined;
 
 const highlights = [
   {
@@ -32,11 +36,27 @@ const highlights = [
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [halalFilter, setHalalFilter] = useState<HalalFilter>(undefined);
+  const [priceFilter, setPriceFilter] = useState<PriceFilter>(undefined);
+  const [cuisineFilter, setCuisineFilter] = useState<string | undefined>(undefined);
 
-  const restaurants = useQuery(
-    searchTerm.trim() ? api.restaurants.search : api.restaurants.list,
-    searchTerm.trim() ? { term: searchTerm } : undefined,
+  const filterArgs = {
+    ...(halalFilter ? { halalStatus: halalFilter } : {}),
+    ...(priceFilter ? { priceRange: priceFilter } : {}),
+    ...(cuisineFilter ? { cuisine: cuisineFilter } : {}),
+  };
+
+  const listResults = useQuery(
+    api.restaurants.list,
+    !searchTerm.trim() ? filterArgs : "skip",
   );
+  const searchResults = useQuery(
+    api.restaurants.search,
+    searchTerm.trim() ? { term: searchTerm, ...filterArgs } : "skip",
+  );
+  const restaurants = searchTerm.trim() ? searchResults : listResults;
+
+  const cuisines = useQuery(api.restaurants.getCuisines);
 
   const handleSearch = useCallback((term: string) => {
     setSearchTerm(term);
@@ -95,13 +115,23 @@ export default function Home() {
           })}
         </motion.div>
 
-        {/* Search */}
+        {/* Search + Filters */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
+          className="space-y-4"
         >
-          <SearchBar onSearch={handleSearch} placeholder="Search Malaysian restaurants..." />
+          <SearchBar onSearch={handleSearch} placeholder="Search KL restaurants..." />
+          <SearchFilters
+            halalFilter={halalFilter}
+            priceFilter={priceFilter}
+            cuisineFilter={cuisineFilter}
+            cuisines={cuisines ?? []}
+            onHalalChange={setHalalFilter}
+            onPriceChange={setPriceFilter}
+            onCuisineChange={setCuisineFilter}
+          />
         </motion.div>
 
         {/* Restaurant grid */}
@@ -113,7 +143,7 @@ export default function Home() {
             </div>
           ) : restaurants.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-gray-400">No restaurants found. Try a different search term.</p>
+              <p className="text-gray-400">No restaurants found. Try different filters or search term.</p>
             </div>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

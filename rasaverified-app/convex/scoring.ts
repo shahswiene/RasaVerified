@@ -198,10 +198,12 @@ export const computeTrustScore = internalMutation({
   handler: async (ctx, { restaurantId }) => {
     console.log(`[scoring] Computing trust score for restaurant ${restaurantId}`);
 
-    const reviews = await ctx.db
+    const allReviews = await ctx.db
       .query("reviews")
       .withIndex("by_restaurant", (q) => q.eq("restaurantId", restaurantId))
       .collect();
+    // Only score active reviews (deduped community reviews are set inactive)
+    const reviews = allReviews.filter((r) => r.active);
 
     const reviewerIds = [...new Set(reviews.map((r) => r.reviewerId))];
     const reviewers: Doc<"reviewers">[] = [];

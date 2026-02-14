@@ -6,8 +6,9 @@ import { api } from '../../../../convex/_generated/api';
 import { TrustScoreDashboard } from '@/components/trust-score-dashboard';
 import { ReviewList } from '@/components/review-list';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MapPin, Utensils, MessageSquare } from 'lucide-react';
+import { ArrowLeft, MapPin, Utensils, MessageSquare, BadgeCheck, DollarSign } from 'lucide-react';
 import Link from 'next/link';
+import { AddReviewForm } from '@/components/add-review-form';
 import type { Id } from '../../../../convex/_generated/dataModel';
 
 export default function RestaurantDetailPage() {
@@ -76,7 +77,7 @@ export default function RestaurantDetailPage() {
           <h1 className="text-3xl font-bold sm:text-4xl bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
             {restaurant.name}
           </h1>
-          <div className="flex items-center gap-4 text-sm text-gray-400">
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
             <span className="flex items-center gap-1.5">
               <MapPin className="w-4 h-4 text-emerald-400" />
               {restaurant.location}
@@ -91,6 +92,23 @@ export default function RestaurantDetailPage() {
                 {reviews.length} reviews
               </span>
             )}
+          </div>
+          <div className="flex flex-wrap items-center gap-2 mt-2">
+            {restaurant.halalStatus === "halal" && (
+              <span className="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full border bg-emerald-500/15 border-emerald-500/40 text-emerald-300">
+                <BadgeCheck className="w-3.5 h-3.5" />
+                Halal Certified
+              </span>
+            )}
+            {restaurant.halalStatus === "non-halal" && (
+              <span className="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full border bg-orange-500/15 border-orange-500/40 text-orange-300">
+                Non-Halal
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full border bg-white/5 border-white/20 text-gray-300">
+              <DollarSign className="w-3.5 h-3.5" />
+              {restaurant.priceRange}
+            </span>
           </div>
         </motion.section>
 
@@ -113,7 +131,10 @@ export default function RestaurantDetailPage() {
           </div>
 
           {/* Reviews (narrower) */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-4">
+            {/* Add review form */}
+            <AddReviewForm restaurantId={restaurantId} />
+
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}

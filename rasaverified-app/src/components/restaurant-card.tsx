@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { MapPin, Utensils } from 'lucide-react';
+import { MapPin, Utensils, BadgeCheck, DollarSign } from 'lucide-react';
 import type { Doc } from '../../convex/_generated/dataModel';
 
 interface RestaurantCardProps {
@@ -67,16 +67,36 @@ export function RestaurantCard({ restaurant, trustScore, index }: RestaurantCard
             </span>
           </div>
 
-          {/* Verdict tag */}
-          {trustScore?.verdict && (
-            <div className="mt-3">
+          {/* Badges row: halal, price, verdict */}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {/* Halal badge */}
+            {restaurant.halalStatus === "halal" && (
+              <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border bg-emerald-500/15 border-emerald-500/40 text-emerald-300">
+                <BadgeCheck className="w-3 h-3" />
+                Halal
+              </span>
+            )}
+            {restaurant.halalStatus === "non-halal" && (
+              <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border bg-orange-500/15 border-orange-500/40 text-orange-300">
+                Non-Halal
+              </span>
+            )}
+
+            {/* Price range badge */}
+            <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border bg-white/5 border-white/20 text-gray-300">
+              <DollarSign className="w-3 h-3" />
+              {restaurant.priceRange}
+            </span>
+
+            {/* Verdict tag */}
+            {trustScore?.verdict && (
               <span
                 className={`inline-block text-xs px-2.5 py-1 rounded-full border ${getScoreBg(score ?? 0)} ${getScoreColor(score ?? 0)}`}
               >
                 {trustScore.verdict}
               </span>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </Link>
     </motion.div>

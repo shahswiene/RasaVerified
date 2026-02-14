@@ -2,15 +2,19 @@ import { internalMutation } from "./_generated/server";
 import { internal } from "./_generated/api";
 
 // Malaysian restaurant mock data with varied credibility profiles
-const RESTAURANTS = [
-  { name: "Nasi Kandar Pelita", location: "Kuala Lumpur", cuisine: "Malay" },
-  { name: "Din Tai Fung KLCC", location: "Kuala Lumpur", cuisine: "Chinese" },
-  { name: "Restoran Rebung", location: "Bangsar", cuisine: "Malay" },
-  { name: "Jalan Alor Street Food", location: "Bukit Bintang", cuisine: "Mixed" },
-  { name: "Village Park Restaurant", location: "Damansara Utama", cuisine: "Malay" },
-  { name: "MyBurgerLab", location: "Seapark PJ", cuisine: "Western" },
-  { name: "Raju's Banana Leaf", location: "Bangsar", cuisine: "Indian" },
-  { name: "Sushi Zanmai", location: "Pavilion KL", cuisine: "Japanese" },
+const RESTAURANTS: {
+  name: string; location: string; cuisine: string;
+  halalStatus: "halal" | "non-halal" | "unknown";
+  priceRange: "$" | "$$" | "$$$" | "$$$$";
+}[] = [
+  { name: "Nasi Kandar Pelita", location: "Kuala Lumpur", cuisine: "Malay", halalStatus: "halal", priceRange: "$" },
+  { name: "Din Tai Fung KLCC", location: "Kuala Lumpur", cuisine: "Chinese", halalStatus: "non-halal", priceRange: "$$$" },
+  { name: "Restoran Rebung", location: "Bangsar", cuisine: "Malay", halalStatus: "halal", priceRange: "$$" },
+  { name: "Jalan Alor Street Food", location: "Bukit Bintang", cuisine: "Mixed", halalStatus: "unknown", priceRange: "$" },
+  { name: "Village Park Restaurant", location: "Damansara Utama", cuisine: "Malay", halalStatus: "halal", priceRange: "$" },
+  { name: "MyBurgerLab", location: "Seapark PJ", cuisine: "Western", halalStatus: "non-halal", priceRange: "$$" },
+  { name: "Raju's Banana Leaf", location: "Bangsar", cuisine: "Indian", halalStatus: "halal", priceRange: "$" },
+  { name: "Sushi Zanmai", location: "Pavilion KL", cuisine: "Japanese", halalStatus: "non-halal", priceRange: "$$$" },
 ];
 
 // Reviewer archetypes with varied credibility
@@ -95,6 +99,9 @@ export const seedAll = internalMutation(async (ctx) => {
   const existingScores = await ctx.db.query("trust_scores").collect();
   for (const s of existingScores) await ctx.db.delete(s._id);
 
+  const existingUsers = await ctx.db.query("users").collect();
+  for (const u of existingUsers) await ctx.db.delete(u._id);
+
   // Insert reviewers
   const reviewerIds = [];
   for (const profile of REVIEWER_PROFILES) {
@@ -112,6 +119,7 @@ export const seedAll = internalMutation(async (ctx) => {
   for (let i = 0; i < RESTAURANTS.length; i++) {
     const restaurantId = await ctx.db.insert("restaurants", {
       ...RESTAURANTS[i],
+      source: "seed" as const,
       createdAt: Date.now() - 365 * 24 * 60 * 60 * 1000,
     });
 
@@ -126,6 +134,8 @@ export const seedAll = internalMutation(async (ctx) => {
           rating: review.rating,
           reviewText: review.text,
           reviewerId: reviewer.id,
+          source: "seed" as const,
+          active: true,
           createdAt: randomDate(365),
         });
       }
@@ -137,6 +147,8 @@ export const seedAll = internalMutation(async (ctx) => {
           rating: review.rating,
           reviewText: review.text,
           reviewerId: reviewer.id,
+          source: "seed" as const,
+          active: true,
           createdAt: randomDate(180),
         });
       }
@@ -150,6 +162,8 @@ export const seedAll = internalMutation(async (ctx) => {
           rating: review.rating,
           reviewText: review.text,
           reviewerId: reviewer.id,
+          source: "seed" as const,
+          active: true,
           createdAt: randomDate(300),
         });
       }
@@ -161,6 +175,8 @@ export const seedAll = internalMutation(async (ctx) => {
           rating: review.rating,
           reviewText: review.text,
           reviewerId: reviewer.id,
+          source: "seed" as const,
+          active: true,
           createdAt: randomDate(90),
         });
       }
@@ -173,6 +189,8 @@ export const seedAll = internalMutation(async (ctx) => {
           rating: review.rating,
           reviewText: review.text,
           reviewerId: reviewer.id,
+          source: "seed" as const,
+          active: true,
           createdAt: burstDate(burstBase),
         });
       }
@@ -186,6 +204,8 @@ export const seedAll = internalMutation(async (ctx) => {
           rating: review.rating,
           reviewText: review.text,
           reviewerId: reviewer.id,
+          source: "seed" as const,
+          active: true,
           createdAt: randomDate(200),
         });
       }
@@ -198,6 +218,8 @@ export const seedAll = internalMutation(async (ctx) => {
           rating: review.rating,
           reviewText: review.text,
           reviewerId: reviewer.id,
+          source: "seed" as const,
+          active: true,
           createdAt: burstDate(burstBase),
         });
       }
