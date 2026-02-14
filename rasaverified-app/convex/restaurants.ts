@@ -101,16 +101,15 @@ export const getReviews = query({
           return { ...review, reviewer: null };
         }
 
-        // For community reviews: show per-restaurant count
+        // For community reviews: count total reviews across all restaurants
         // For scraped/seed reviews: show original totalReviews
         let reviewCount: number;
         if (review.source === "community") {
-          const restaurantReviews = await db
+          const allReviews = await db
             .query("reviews")
-            .withIndex("by_restaurant", (q) => q.eq("restaurantId", restaurantId))
-            .filter((q) => q.eq(q.field("reviewerId"), review.reviewerId))
+            .withIndex("by_reviewer", (q) => q.eq("reviewerId", review.reviewerId))
             .collect();
-          reviewCount = restaurantReviews.length;
+          reviewCount = allReviews.length;
         } else {
           reviewCount = reviewer.totalReviews;
         }
