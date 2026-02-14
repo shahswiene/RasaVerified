@@ -104,13 +104,15 @@ export function SearchFilters({
 
       {/* Clear all */}
       {hasActiveFilters && (
-        <button
-          onClick={clearAll}
-          className="flex items-center gap-1 px-3 py-2 text-xs rounded-full border border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20 transition-all"
-        >
-          <X className="w-3 h-3" />
-          Clear
-        </button>
+        <div className="flex flex-col items-center justify-end h-full pt-5">
+          <button
+            onClick={clearAll}
+            className="flex items-center gap-1 px-3 py-2 text-xs rounded-full border border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20 transition-all"
+          >
+            <X className="w-3 h-3" />
+            Clear
+          </button>
+        </div>
       )}
     </div>
   );

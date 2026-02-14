@@ -104,6 +104,22 @@ export const addReview = mutation({
       )
       .collect();
 
+    // Rate limiting: check if user has reviewed this restaurant in the last 3 hours
+    const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
+    const now = Date.now();
+    const recentReview = existingReviews.find(
+      (r) => now - r.createdAt < THREE_HOURS_MS
+    );
+    if (recentReview) {
+      const waitTimeMs = THREE_HOURS_MS - (now - recentReview.createdAt);
+      const waitHours = Math.ceil(waitTimeMs / (60 * 60 * 1000));
+      const waitMinutes = Math.ceil(waitTimeMs / (60 * 1000));
+      const waitMsg = waitHours >= 1 
+        ? `${waitHours} hour${waitHours > 1 ? 's' : ''}`
+        : `${waitMinutes} minute${waitMinutes > 1 ? 's' : ''}`;
+      throw new Error(`You can only review this restaurant once every 3 hours. Please wait ${waitMsg}.`);
+    }
+
     // Deactivate all previous reviews by this user for this restaurant
     for (const oldReview of existingReviews) {
       if (oldReview.active) {
