@@ -47,8 +47,16 @@ export function AddReviewForm({ restaurantId }: AddReviewFormProps) {
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to add review';
+      let message = err instanceof Error ? err.message : 'Failed to add review';
+      // Strip Convex error prefix for cleaner UX
+      const uncaughtIdx = message.indexOf('Uncaught Error: ');
+      if (uncaughtIdx !== -1) {
+        message = message.substring(uncaughtIdx + 'Uncaught Error: '.length).split('. at ')[0];
+      }
       setError(message);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[ui] Review submission error:', message);
+      }
     } finally {
       setIsSubmitting(false);
     }
