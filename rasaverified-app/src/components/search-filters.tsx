@@ -46,60 +46,57 @@ export function SearchFilters({
     onCuisineChange(undefined);
   };
 
+  const selectClass =
+    'bg-white/5 border border-white/10 text-sm text-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:border-emerald-500/50 cursor-pointer min-w-[140px]';
+
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      {/* Halal filter */}
-      <div className="flex items-center gap-1">
-        <span className="text-xs text-gray-500 mr-1">Halal:</span>
-        {HALAL_OPTIONS.map((opt) => (
-          <button
-            key={opt.label}
-            onClick={() => onHalalChange(opt.value)}
-            className={`px-3 py-1.5 text-xs rounded-full border transition-all ${
-              halalFilter === opt.value
-                ? opt.value === "halal"
-                  ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-300"
-                  : opt.value === "non-halal"
-                    ? "bg-orange-500/20 border-orange-500/50 text-orange-300"
-                    : "bg-white/10 border-white/30 text-white"
-                : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:text-white"
-            }`}
-          >
-            {opt.label}
-          </button>
-        ))}
+    <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
+      {/* Halal dropdown */}
+      <div className="flex flex-col items-center text-xs text-gray-400 gap-1.5">
+        <span className="text-center">Halal</span>
+        <select
+          value={halalFilter ?? ''}
+          onChange={(e) =>
+            onHalalChange(e.target.value ? (e.target.value as HalalFilter) : undefined)
+          }
+          className={selectClass}
+        >
+          <option value="" className="bg-gray-900 text-gray-200">All</option>
+          {HALAL_OPTIONS.filter((opt) => opt.value).map((opt) => (
+            <option key={opt.label} value={opt.value} className="bg-gray-900 text-gray-200">{opt.label}</option>
+          ))}
+        </select>
       </div>
 
-      {/* Price filter */}
-      <div className="flex items-center gap-1">
-        <span className="text-xs text-gray-500 mr-1">Price:</span>
-        {PRICE_OPTIONS.map((opt) => (
-          <button
-            key={opt.label}
-            onClick={() => onPriceChange(opt.value)}
-            className={`px-3 py-1.5 text-xs rounded-full border transition-all ${
-              priceFilter === opt.value
-                ? "bg-white/10 border-white/30 text-white"
-                : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:text-white"
-            }`}
-          >
-            {opt.label}
-          </button>
-        ))}
+      {/* Price dropdown */}
+      <div className="flex flex-col items-center text-xs text-gray-400 gap-1.5">
+        <span className="text-center">Price</span>
+        <select
+          value={priceFilter ?? ''}
+          onChange={(e) =>
+            onPriceChange(e.target.value ? (e.target.value as PriceFilter) : undefined)
+          }
+          className={selectClass}
+        >
+          <option value="" className="bg-gray-900 text-gray-200">All</option>
+          {PRICE_OPTIONS.filter((opt) => opt.value).map((opt) => (
+            <option key={opt.label} value={opt.value} className="bg-gray-900 text-gray-200">{opt.label}</option>
+          ))}
+        </select>
       </div>
 
-      {/* Cuisine filter */}
+      {/* Cuisine dropdown */}
       {cuisines.length > 0 && (
-        <div className="flex items-center gap-1">
-          <span className="text-xs text-gray-500 mr-1">Cuisine:</span>
+        <div className="flex flex-col items-center text-xs text-gray-400 gap-1.5">
+          <span className="text-center">Cuisine</span>
           <select
-            value={cuisineFilter ?? ""}
+            value={cuisineFilter ?? ''}
             onChange={(e) => onCuisineChange(e.target.value || undefined)}
-            className="bg-white/5 border border-white/10 text-sm text-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:border-emerald-500/50 appearance-none cursor-pointer"
+            className={selectClass}
           >
-            <option value="" className="bg-gray-900">All</option>
+            <option value="" className="bg-gray-900 text-gray-200">All</option>
             {cuisines.map((c) => (
-              <option key={c} value={c} className="bg-gray-900">{c}</option>
+              <option key={c} value={c} className="bg-gray-900 text-gray-200">{c}</option>
             ))}
           </select>
         </div>
@@ -109,7 +106,7 @@ export function SearchFilters({
       {hasActiveFilters && (
         <button
           onClick={clearAll}
-          className="flex items-center gap-1 px-3 py-1.5 text-xs rounded-full border border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20 transition-all"
+          className="flex items-center gap-1 px-3 py-2 text-xs rounded-full border border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20 transition-all"
         >
           <X className="w-3 h-3" />
           Clear

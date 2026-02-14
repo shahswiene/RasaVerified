@@ -11,12 +11,16 @@ interface ReviewerInfo {
   suspiciousScore: number;
 }
 
+interface ReviewerInfoWithCount extends ReviewerInfo {
+  restaurantReviewCount: number;
+}
+
 interface ReviewWithReviewer {
   _id: string;
   rating: number;
   reviewText: string;
   createdAt: number;
-  reviewer: ReviewerInfo | null;
+  reviewer: ReviewerInfoWithCount | null;
 }
 
 interface ReviewListProps {
@@ -40,11 +44,11 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-function ReviewerBadge({ reviewer }: { reviewer: ReviewerInfo | null }) {
+function ReviewerBadge({ reviewer }: { reviewer: ReviewerInfoWithCount | null }) {
   if (!reviewer) return null;
 
   const isSuspicious = reviewer.suspiciousScore >= 50;
-  const isNew = reviewer.totalReviews <= 2;
+  const reviewCount = reviewer.restaurantReviewCount || 1;
 
   return (
     <div className="flex items-center gap-2 text-xs">
@@ -53,14 +57,14 @@ function ReviewerBadge({ reviewer }: { reviewer: ReviewerInfo | null }) {
         <span>{reviewer.name}</span>
       </div>
       <span className="text-gray-600">·</span>
-      <span className="text-gray-500">{reviewer.totalReviews} reviews</span>
+      <span className="text-gray-500">{reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}</span>
       {isSuspicious && (
         <span className="flex items-center gap-0.5 text-red-400">
           <AlertCircle className="w-3 h-3" />
           Suspicious
         </span>
       )}
-      {!isSuspicious && !isNew && (
+      {!isSuspicious && (
         <span className="flex items-center gap-0.5 text-emerald-400">
           <CheckCircle className="w-3 h-3" />
           Verified

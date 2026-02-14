@@ -276,13 +276,15 @@ export default function ProfilePage() {
                   placeholder="••••••••"
                 />
               </div>
-              <button
-                type="submit"
-                disabled={pwSubmitting}
-                className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {pwSubmitting ? 'Updating...' : 'Update Password'}
-              </button>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={pwSubmitting}
+                  className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {pwSubmitting ? 'Updating...' : 'Update Password'}
+                </button>
+              </div>
             </form>
           </div>
         </motion.section>
@@ -298,15 +300,17 @@ export default function ProfilePage() {
             <p className="text-sm text-gray-400 mb-4">
               You will need to sign in again to add restaurants or reviews.
             </p>
-            <button
-              onClick={() => {
-                logout();
-                router.push('/');
-              }}
-              className="px-5 py-2.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20 font-medium transition-colors"
-            >
-              Sign Out
-            </button>
+            <div className="flex justify-end">
+              <button
+                onClick={() => {
+                  logout();
+                  router.push('/');
+                }}
+                className="px-5 py-2.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20 font-medium transition-colors"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
         </motion.section>
       </main>
