@@ -100,7 +100,7 @@ export function ReviewList({ reviews }: ReviewListProps) {
             </span>
           </div>
 
-          <p className="text-sm text-gray-300 leading-relaxed mb-3">
+          <p className="text-sm text-gray-300 leading-relaxed mb-3 break-words overflow-wrap-anywhere">
             {review.reviewText}
           </p>
 
