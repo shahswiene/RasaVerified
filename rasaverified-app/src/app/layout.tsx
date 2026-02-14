@@ -17,6 +17,11 @@ export const metadata: Metadata = {
   title: "RasaVerified",
   description: "AI-Powered Restaurant Review Credibility Engine",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icons/icon-192.svg",
+    shortcut: "/icons/icon-192.svg",
+    apple: "/icons/icon-192.svg",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
