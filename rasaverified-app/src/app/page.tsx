@@ -1,79 +1,151 @@
-import Link from "next/link";
-import { ConvexDemo } from "@/components/convex-demo";
+'use client';
+
+import { useState, useCallback } from 'react';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+import { SearchBar } from '@/components/search-bar';
+import { RestaurantCard } from '@/components/restaurant-card';
+import { ShieldCheck, Sparkles, Zap } from 'lucide-react';
+import { motion } from 'framer-motion';
+import type { Doc, Id } from '../../convex/_generated/dataModel';
 
 const highlights = [
   {
     label: "Signal-to-noise",
     value: "92%",
-    description: "Bot + sponsor detection accuracy in internal tests",
+    description: "Bot + sponsor detection accuracy",
+    icon: ShieldCheck,
   },
   {
     label: "Realtime",
     value: "<2s",
-    description: "Fresh trust-score recompute window",
+    description: "Fresh trust-score recompute",
+    icon: Zap,
   },
   {
     label: "Stack",
-    value: "Next.js + Convex",
-    description: "Streaming PWA with serverless scoring",
+    value: "Next + Convex",
+    description: "Streaming PWA + serverless scoring",
+    icon: Sparkles,
   },
 ];
 
 export default function Home() {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const restaurants = useQuery(
+    searchTerm.trim() ? api.restaurants.search : api.restaurants.list,
+    searchTerm.trim() ? { term: searchTerm } : undefined,
+  );
+
+  const handleSearch = useCallback((term: string) => {
+    setSearchTerm(term);
+    if (process.env.NODE_ENV === 'development') {
+      console.debug(`[ui] Search term: "${term}"`);
+    }
+  }, []);
+
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-950 via-purple-950 to-rose-900 px-6 py-16 text-white">
-      <div className="pointer-events-none absolute inset-0 opacity-40">
-        <div className="absolute inset-y-0 left-1/2 h-full w-[40rem] -translate-x-1/2 rounded-full bg-pink-500 blur-[200px]" />
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 px-6 py-12 text-white">
+      {/* Background glow effects */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute top-0 left-1/4 h-[30rem] w-[30rem] rounded-full bg-emerald-500/10 blur-[180px]" />
+        <div className="absolute bottom-0 right-1/4 h-[25rem] w-[25rem] rounded-full bg-purple-500/10 blur-[160px]" />
       </div>
 
-      <main className="relative z-10 mx-auto flex max-w-6xl flex-col gap-16 lg:flex-row">
-        <section className="flex-1 space-y-8">
-          <p className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-1 text-xs uppercase tracking-[0.3em] text-rose-200">
+      <main className="relative z-10 mx-auto max-w-6xl space-y-12">
+        {/* Hero */}
+        <motion.section
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center space-y-6"
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs uppercase tracking-[0.3em] text-emerald-300">
+            <ShieldCheck className="w-3.5 h-3.5" />
             RasaVerified • Credibility Engine
-          </p>
-          <h1 className="text-4xl font-semibold leading-tight text-white sm:text-5xl">
-            Reduce fake food hype. Surface reviews you can actually trust.
+          </div>
+          <h1 className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl bg-gradient-to-r from-white via-emerald-100 to-emerald-300 bg-clip-text text-transparent">
+            Verify Before You Bite
           </h1>
-          <p className="max-w-2xl text-lg text-rose-100/90">
-            We aggregate multichannel restaurant chatter, score authenticity with heuristic + AI signals, and visualize trust in a
-            cinematic 3D dashboard. Powered by Next.js App Router, Convex realtime data, and upcoming 3D trust spheres.
+          <p className="mx-auto max-w-2xl text-lg text-gray-400">
+            AI-powered heuristic scoring to separate genuine restaurant reviews from sponsored noise and bot spam.
           </p>
+        </motion.section>
 
-          <div className="grid gap-4 sm:grid-cols-3">
-            {highlights.map((item) => (
-              <article
+        {/* Stats */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="grid gap-4 sm:grid-cols-3 max-w-3xl mx-auto"
+        >
+          {highlights.map((item) => {
+            const Icon = item.icon;
+            return (
+              <div
                 key={item.label}
-                className="rounded-3xl border border-white/10 bg-white/10 p-4 backdrop-blur"
+                className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-4 text-center"
               >
-                <p className="text-sm uppercase tracking-[0.2em] text-rose-200">{item.label}</p>
-                <p className="text-3xl font-semibold text-white">{item.value}</p>
-                <p className="text-xs text-rose-100/80">{item.description}</p>
-              </article>
-            ))}
-          </div>
+                <Icon className="w-5 h-5 text-emerald-400 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-white">{item.value}</p>
+                <p className="text-xs text-gray-400 mt-1">{item.description}</p>
+              </div>
+            );
+          })}
+        </motion.div>
 
-          <div className="flex flex-wrap gap-4">
-            <Link
-              href="https://nextjs.org/docs"
-              target="_blank"
-              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-gray-900 transition hover:bg-rose-50"
-            >
-              View build notes
-            </Link>
-            <Link
-              href="https://dashboard.convex.dev"
-              target="_blank"
-              className="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white transition hover:border-white"
-            >
-              Inspect Convex data
-            </Link>
-          </div>
+        {/* Search */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+        >
+          <SearchBar onSearch={handleSearch} placeholder="Search Malaysian restaurants..." />
+        </motion.div>
+
+        {/* Restaurant grid */}
+        <section>
+          {restaurants === undefined ? (
+            <div className="text-center py-16">
+              <div className="inline-block w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+              <p className="text-gray-400 mt-3 text-sm">Loading restaurants...</p>
+            </div>
+          ) : restaurants.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-gray-400">No restaurants found. Try a different search term.</p>
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {restaurants.map((restaurant, i) => (
+                <RestaurantCardWithScore
+                  key={restaurant._id}
+                  restaurant={restaurant}
+                  index={i}
+                />
+              ))}
+            </div>
+          )}
         </section>
-
-        <div className="flex-1">
-          <ConvexDemo />
-        </div>
       </main>
     </div>
+  );
+}
+
+// Sub-component to fetch trust score per restaurant
+function RestaurantCardWithScore({ restaurant, index }: {
+  restaurant: Doc<"restaurants">;
+  index: number;
+}) {
+  const trustScore = useQuery(api.restaurants.getTrustScore, {
+    restaurantId: restaurant._id as Id<"restaurants">,
+  });
+
+  return (
+    <RestaurantCard
+      restaurant={restaurant}
+      trustScore={trustScore}
+      index={index}
+    />
   );
 }

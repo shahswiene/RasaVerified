@@ -101,15 +101,27 @@ Short 5⭐ pattern detection
 
 ## 🧱 Repository Layout & App Stack
 
--   `/rasaverified-app` — Next.js App Router project (TypeScript + Tailwind 4)
-    -   `/src/app` renders the landing page plus Convex demo component
-    -   `/src/components/convex-demo.tsx` streams live data from Convex
-    -   `/src/lib/convexClient.ts` bootstraps a singleton `ConvexReactClient`
-    -   `/convex` holds schema + serverless functions (messages sample included)
+-   `/rasaverified-app` — Next.js 16 App Router (TypeScript + Tailwind 4)
+    -   `/src/app/page.tsx` — Home page: hero, search bar, restaurant grid with live trust badges
+    -   `/src/app/restaurant/[id]/page.tsx` — Detail page: 3D Trust Sphere, score dashboard, review list
+    -   `/src/components/`
+        -   `search-bar.tsx` — Real-time restaurant search input
+        -   `restaurant-card.tsx` — Animated card with trust score badge & verdict tag
+        -   `trust-score-dashboard.tsx` — Animated ring gauge, 5-dimension breakdown, suspicion flags
+        -   `trust-sphere.tsx` — Three.js 3D sphere (colour/distortion reflects score)
+        -   `review-list.tsx` — Review cards with star ratings & reviewer credibility badges
+        -   `convex-client-provider.tsx` — ConvexProvider wrapper for the app
+    -   `/src/lib/convexClient.ts` — Singleton `ConvexReactClient`
+    -   `/convex/`
+        -   `schema.ts` — Tables: restaurants, reviews, reviewers, trust_scores
+        -   `restaurants.ts` — Queries: list, search (full-text), getById, getReviews, getTrustScore
+        -   `scoring.ts` — Heuristic credibility engine (5 weighted sub-scores → verdict)
+        -   `seed.ts` — Mock data: 8 Malaysian restaurants, 14 reviewer profiles, varied credibility
+    -   `/public/manifest.json` — PWA manifest
     -   `package.json` scripts:
-        -   `npm run dev` → default Next.js dev server
-        -   `npm run convex:dev` → `convex dev --cmd "next dev"` (one command to sync Convex + Next)
-        -   `npm run convex:deploy` → pushes latest Convex code before Vercel release
+        -   `npm run dev` → Next.js dev server
+        -   `npm run convex:dev` → `convex dev --run-sh "next dev"` (sync Convex + Next)
+        -   `npm run convex:deploy` → push Convex code before Vercel release
 -   Root folder keeps hackathon docs, env templates, and project-level `.gitignore`.
 
 ------------------------------------------------------------------------
@@ -118,7 +130,7 @@ Short 5⭐ pattern detection
 
 ### restaurants
 
-{ \_id, name, location, createdAt }
+{ \_id, name, location, cuisine, imageUrl?, createdAt }
 
 ### reviews
 
@@ -126,12 +138,12 @@ Short 5⭐ pattern detection
 
 ### reviewers
 
-{ \_id, totalReviews, accountAge, suspiciousScore }
+{ \_id, name, totalReviews, accountAge, suspiciousScore }
 
-### trust_scores
+### trust\_scores
 
-{ restaurantId, overallScore, anomalyScore, burstScore, languageScore,
-updatedAt }
+{ restaurantId, overallScore, reviewerCredibility, ratingStability,
+languageAuthenticity, burstScore, reviewDiversity, flags[], verdict, updatedAt }
 
 ------------------------------------------------------------------------
 
