@@ -99,6 +99,21 @@ Short 5⭐ pattern detection
 
 ------------------------------------------------------------------------
 
+## 🧱 Repository Layout & App Stack
+
+-   `/rasaverified-app` — Next.js App Router project (TypeScript + Tailwind 4)
+    -   `/src/app` renders the landing page plus Convex demo component
+    -   `/src/components/convex-demo.tsx` streams live data from Convex
+    -   `/src/lib/convexClient.ts` bootstraps a singleton `ConvexReactClient`
+    -   `/convex` holds schema + serverless functions (messages sample included)
+    -   `package.json` scripts:
+        -   `npm run dev` → default Next.js dev server
+        -   `npm run convex:dev` → `convex dev --cmd "next dev"` (one command to sync Convex + Next)
+        -   `npm run convex:deploy` → pushes latest Convex code before Vercel release
+-   Root folder keeps hackathon docs, env templates, and project-level `.gitignore`.
+
+------------------------------------------------------------------------
+
 ## 🗄 Database Plan (Convex)
 
 ### restaurants

@@ -1,5 +1,6 @@
 # Environment files (keep secrets out of git)
 .env*
+**/.env*
 
 # Dependencies and package managers
 node_modules/
