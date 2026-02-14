@@ -12,6 +12,8 @@ import type * as auth from "../auth.js";
 import type * as community from "../community.js";
 import type * as restaurants from "../restaurants.js";
 import type * as scoring from "../scoring.js";
+import type * as scraper from "../scraper.js";
+import type * as scraperSeed from "../scraperSeed.js";
 import type * as seed from "../seed.js";
 
 import type {
@@ -25,6 +27,8 @@ declare const fullApi: ApiFromModules<{
   community: typeof community;
   restaurants: typeof restaurants;
   scoring: typeof scoring;
+  scraper: typeof scraper;
+  scraperSeed: typeof scraperSeed;
   seed: typeof seed;
 }>;
 
