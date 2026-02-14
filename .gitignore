@@ -1,0 +1,8 @@
+# Ignore environment files containing secrets
+.env*
+
+# Node and Next.js build artifacts (if repo initialized later)
+node_modules/
+.next/
+dist/
+out/
