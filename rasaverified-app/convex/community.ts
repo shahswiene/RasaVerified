@@ -48,7 +48,7 @@ export const addRestaurant = mutation({
     // Check if user already has reviews (and thus a reviewer profile)
     const userReviews = await ctx.db
       .query("reviews")
-      .withIndex("by_user_restaurant", (q) => q.eq("addedByUserId", args.userId))
+      .withIndex("by_user", (q) => q.eq("addedByUserId", args.userId))
       .first();
 
     let reviewerId;
@@ -161,7 +161,7 @@ export const addReview = mutation({
     // Look for ANY review by this user to get their reviewer profile
     const anyUserReview = await ctx.db
       .query("reviews")
-      .withIndex("by_user_restaurant", (q) => q.eq("addedByUserId", args.userId))
+      .withIndex("by_user", (q) => q.eq("addedByUserId", args.userId))
       .first();
 
     let reviewerId;

@@ -43,7 +43,8 @@ export default defineSchema({
     .index("by_reviewer", ["reviewerId"])
     .index("by_restaurant_date", ["restaurantId", "createdAt"])
     .index("by_restaurant_active", ["restaurantId", "active"])
-    .index("by_user_restaurant", ["addedByUserId", "restaurantId"]),
+    .index("by_user_restaurant", ["addedByUserId", "restaurantId"])
+    .index("by_user", ["addedByUserId"]),
 
   reviewers: defineTable({
     name: v.string(),
