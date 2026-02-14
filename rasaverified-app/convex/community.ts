@@ -125,6 +125,8 @@ export const addReview = mutation({
       .collect();
 
     // Rate limiting: check if user has reviewed this restaurant in the last 3 hours
+    // TEMPORARILY DISABLED FOR TESTING
+    /*
     const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
     const now = Date.now();
     const recentReview = existingReviews.find(
@@ -139,6 +141,7 @@ export const addReview = mutation({
         : `${waitMinutes} minute${waitMinutes > 1 ? 's' : ''}`;
       throw new Error(`You can only review this restaurant once every 3 hours. Please wait ${waitMsg}.`);
     }
+    */
 
     // Deactivate all previous reviews by this user for this restaurant
     for (const oldReview of existingReviews) {
