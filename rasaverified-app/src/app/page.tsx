@@ -15,9 +15,9 @@ type PriceFilter = "$" | "$$" | "$$$" | "$$$$" | undefined;
 
 const highlights = [
   {
-    label: "Signal-to-noise",
-    value: "92%",
-    description: "Bot + sponsor detection accuracy",
+    label: "Trust Analysis",
+    value: "5 Metrics",
+    description: "Multi-dimensional credibility scoring",
     icon: ShieldCheck,
   },
   {
@@ -89,7 +89,7 @@ export default function Home() {
             Verify Before You Bite
           </h1>
           <p className="mx-auto max-w-2xl text-lg text-gray-400">
-            AI-powered heuristic scoring to separate genuine restaurant reviews from sponsored noise and bot spam.
+            Heuristic-based credibility scoring to separate genuine restaurant reviews from sponsored noise and bot spam.
           </p>
         </motion.section>
 
