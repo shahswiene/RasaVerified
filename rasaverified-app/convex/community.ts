@@ -57,19 +57,23 @@ export const addRestaurant = mutation({
       reviewerId = userReviews.reviewerId;
       const reviewer = await ctx.db.get(reviewerId);
       if (reviewer) {
+        console.log(`[community] Reusing reviewer profile: id=${reviewerId}, current totalReviews=${reviewer.totalReviews}`);
         await ctx.db.patch(reviewerId, {
           totalReviews: reviewer.totalReviews + 1,
           accountAge: Math.floor((Date.now() - user.createdAt) / (24 * 60 * 60 * 1000)),
         });
+        console.log(`[community] Updated totalReviews to ${reviewer.totalReviews + 1}`);
       }
     } else {
       // Create new reviewer profile for first-time reviewer
+      console.log(`[community] Creating new reviewer profile for user=${args.userId}`);
       reviewerId = await ctx.db.insert("reviewers", {
         name: user.name,
         totalReviews: 1,
         accountAge: Math.floor((Date.now() - user.createdAt) / (24 * 60 * 60 * 1000)),
         suspiciousScore: 10,
       });
+      console.log(`[community] Created reviewer profile: id=${reviewerId}`);
     }
 
     // Insert the initial review
@@ -166,19 +170,23 @@ export const addReview = mutation({
       reviewerId = anyUserReview.reviewerId;
       const reviewer = await ctx.db.get(reviewerId);
       if (reviewer) {
+        console.log(`[community] Reusing reviewer profile: id=${reviewerId}, current totalReviews=${reviewer.totalReviews}`);
         await ctx.db.patch(reviewerId, {
           totalReviews: reviewer.totalReviews + 1,
           accountAge: Math.floor((Date.now() - user.createdAt) / (24 * 60 * 60 * 1000)),
         });
+        console.log(`[community] Updated totalReviews to ${reviewer.totalReviews + 1}`);
       }
     } else {
       // Create new reviewer profile for first-time reviewer
+      console.log(`[community] Creating new reviewer profile for user=${args.userId}`);
       reviewerId = await ctx.db.insert("reviewers", {
         name: user.name,
         totalReviews: 1,
         accountAge: Math.floor((Date.now() - user.createdAt) / (24 * 60 * 60 * 1000)),
         suspiciousScore: 10,
       });
+      console.log(`[community] Created reviewer profile: id=${reviewerId}`);
     }
 
     // Insert the new review
