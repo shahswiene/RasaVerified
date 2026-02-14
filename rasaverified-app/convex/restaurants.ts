@@ -93,7 +93,7 @@ export const getReviews = query({
       .withIndex("by_restaurant", (q) => q.eq("restaurantId", restaurantId))
       .collect();
 
-    // Attach reviewer info to each review with restaurant-specific review count
+    // Attach reviewer info to each review with appropriate review count
     const enriched = await Promise.all(
       reviews.map(async (review) => {
         const reviewer = await db.get(review.reviewerId);
@@ -101,18 +101,25 @@ export const getReviews = query({
           return { ...review, reviewer: null };
         }
 
-        // Count reviews by this reviewer for this specific restaurant
-        const restaurantReviews = await db
-          .query("reviews")
-          .withIndex("by_restaurant", (q) => q.eq("restaurantId", restaurantId))
-          .filter((q) => q.eq(q.field("reviewerId"), review.reviewerId))
-          .collect();
+        // For community reviews: show per-restaurant count
+        // For scraped/seed reviews: show original totalReviews
+        let reviewCount: number;
+        if (review.source === "community") {
+          const restaurantReviews = await db
+            .query("reviews")
+            .withIndex("by_restaurant", (q) => q.eq("restaurantId", restaurantId))
+            .filter((q) => q.eq(q.field("reviewerId"), review.reviewerId))
+            .collect();
+          reviewCount = restaurantReviews.length;
+        } else {
+          reviewCount = reviewer.totalReviews;
+        }
 
         return {
           ...review,
           reviewer: {
             ...reviewer,
-            restaurantReviewCount: restaurantReviews.length,
+            restaurantReviewCount: reviewCount,
           },
         };
       }),
