@@ -4,49 +4,33 @@ import { internal } from "./_generated/api";
 // Scraped from Google Maps: "popular restaurants in Kuala Lumpur" on 2026-02-14
 const SCRAPED_RESTAURANTS = [
   {
-    name: "Bijan Bar & Restaurant",
-    location: "Jalan Ceylon, KL",
-    cuisine: "Malay",
-    halalStatus: "halal" as const,
-    priceRange: "$$$" as const,
-    avgRating: 4.5,
-  },
-  {
-    name: "Irama Dining Kuala Lumpur",
-    location: "Lorong Raja Chulan, KL",
-    cuisine: "Malay",
-    halalStatus: "halal" as const,
-    priceRange: "$$$" as const,
-    avgRating: 4.6,
-  },
-  {
-    name: "Bar.Kar Best Restaurant KL",
-    location: "Jalan Tun Razak, KL",
-    cuisine: "Mixed",
-    halalStatus: "unknown" as const,
-    priceRange: "$$" as const,
-    avgRating: 4.6,
-  },
-  {
-    name: "Bunglow37",
-    location: "Jalan Abdullah, KL",
+    name: "UpperDeck KL",
+    location: "Jalan Petaling, KL",
     cuisine: "Western",
-    halalStatus: "non-halal" as const,
-    priceRange: "$$$" as const,
-    avgRating: 4.6,
-  },
-  {
-    name: "Come On Tigers Restaurant",
-    location: "Jalan Ampang, KL",
-    cuisine: "Chinese",
     halalStatus: "non-halal" as const,
     priceRange: "$$" as const,
     avgRating: 4.7,
   },
   {
+    name: "Poblano KL",
+    location: "Lorong Raja Chulan, KL",
+    cuisine: "Latin American",
+    halalStatus: "non-halal" as const,
+    priceRange: "$$$" as const,
+    avgRating: 4.9,
+  },
+  {
+    name: "Dining In The Dark KL",
+    location: "Changkat Bukit Bintang, KL",
+    cuisine: "Fine Dining",
+    halalStatus: "non-halal" as const,
+    priceRange: "$$$$" as const,
+    avgRating: 4.7,
+  },
+  {
     name: "Beta KL",
     location: "Jalan Perak, KL",
-    cuisine: "Malay",
+    cuisine: "Fine Dining",
     halalStatus: "halal" as const,
     priceRange: "$$$$" as const,
     avgRating: 4.8,
@@ -54,10 +38,50 @@ const SCRAPED_RESTAURANTS = [
   {
     name: "Fuego at Troika Sky Dining",
     location: "Persiaran KLCC, KL",
-    cuisine: "Western",
+    cuisine: "South American",
     halalStatus: "non-halal" as const,
     priceRange: "$$$$" as const,
     avgRating: 4.7,
+  },
+  {
+    name: "Sarastro KL by Millennium",
+    location: "Jalan Sultan Ismail, KL",
+    cuisine: "Fine Dining",
+    halalStatus: "non-halal" as const,
+    priceRange: "$$$" as const,
+    avgRating: 4.8,
+  },
+  {
+    name: "Cielo Rooftop Dining",
+    location: "Jalan Ceylon, KL",
+    cuisine: "Western",
+    halalStatus: "non-halal" as const,
+    priceRange: "$$$$" as const,
+    avgRating: 4.6,
+  },
+  {
+    name: "Nasi Kandar Pelita",
+    location: "Jalan Ampang, KL",
+    cuisine: "Malay",
+    halalStatus: "halal" as const,
+    priceRange: "$" as const,
+    avgRating: 4.5,
+  },
+  {
+    name: "Jalan Alor Food Street",
+    location: "Jalan Alor, KL",
+    cuisine: "Chinese",
+    halalStatus: "non-halal" as const,
+    priceRange: "$$" as const,
+    avgRating: 4.4,
+  },
+  {
+    name: "Bijan Bar & Restaurant",
+    location: "Jalan Ceylon, KL",
+    cuisine: "Malay",
+    halalStatus: "halal" as const,
+    priceRange: "$$$" as const,
+    avgRating: 4.5,
   },
   {
     name: "Dewakan",
@@ -70,7 +94,7 @@ const SCRAPED_RESTAURANTS = [
   {
     name: "Limapulo Baba Can Cook",
     location: "Jalan Doraisamy, KL",
-    cuisine: "Mixed",
+    cuisine: "Peranakan",
     halalStatus: "non-halal" as const,
     priceRange: "$$" as const,
     avgRating: 4.5,
@@ -82,6 +106,62 @@ const SCRAPED_RESTAURANTS = [
     halalStatus: "halal" as const,
     priceRange: "$" as const,
     avgRating: 4.3,
+  },
+  {
+    name: "Hakka Restaurant KL",
+    location: "Jalan Kia Peng, KL",
+    cuisine: "Chinese",
+    halalStatus: "non-halal" as const,
+    priceRange: "$$" as const,
+    avgRating: 4.6,
+  },
+  {
+    name: "Merchant's Lane",
+    location: "Jalan Petaling, KL",
+    cuisine: "Fusion",
+    halalStatus: "non-halal" as const,
+    priceRange: "$$" as const,
+    avgRating: 4.7,
+  },
+  {
+    name: "Tamarind Springs",
+    location: "Jalan 1 Taman TAR, Ampang",
+    cuisine: "Thai",
+    halalStatus: "non-halal" as const,
+    priceRange: "$$$" as const,
+    avgRating: 4.6,
+  },
+  {
+    name: "Atmosphere 360",
+    location: "KL Tower, Jalan Puncak",
+    cuisine: "International",
+    halalStatus: "halal" as const,
+    priceRange: "$$$$" as const,
+    avgRating: 4.4,
+  },
+  {
+    name: "Songket Restaurant",
+    location: "Jalan Raja Chulan, KL",
+    cuisine: "Malay",
+    halalStatus: "halal" as const,
+    priceRange: "$$$" as const,
+    avgRating: 4.5,
+  },
+  {
+    name: "Opium KL",
+    location: "Jalan Alor, KL",
+    cuisine: "Asian Fusion",
+    halalStatus: "non-halal" as const,
+    priceRange: "$$$" as const,
+    avgRating: 4.7,
+  },
+  {
+    name: "Village Park Restaurant",
+    location: "Damansara Utama, PJ",
+    cuisine: "Malay",
+    halalStatus: "halal" as const,
+    priceRange: "$" as const,
+    avgRating: 4.6,
   },
 ];
 
@@ -151,8 +231,8 @@ export const ingestScrapedData = internalMutation(async (ctx) => {
       createdAt: Date.now(),
     });
 
-    // Generate 5-8 reviews per restaurant
-    const reviewCount = 5 + Math.floor(rand() * 4);
+    // Generate 10-15 reviews per restaurant
+    const reviewCount = 10 + Math.floor(rand() * 6);
     const usedReviewers = new Set<string>();
 
     for (let i = 0; i < reviewCount; i++) {
