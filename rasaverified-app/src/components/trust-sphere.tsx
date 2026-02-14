@@ -1,8 +1,8 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState, Component, type ReactNode } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, MeshDistortMaterial, Float, Text } from '@react-three/drei';
+import { OrbitControls, MeshDistortMaterial, Float } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface TrustSphereProps {
@@ -21,6 +21,67 @@ function getEmissiveFromScore(score: number): string {
   if (score >= 45) return '#d97706';
   return '#dc2626';
 }
+
+function getTailwindColor(score: number): string {
+  if (score >= 75) return 'text-emerald-400';
+  if (score >= 45) return 'text-amber-400';
+  return 'text-red-400';
+}
+
+function getTailwindBorder(score: number): string {
+  if (score >= 75) return 'border-emerald-500/40';
+  if (score >= 45) return 'border-amber-500/40';
+  return 'border-red-500/40';
+}
+
+function getTailwindShadow(score: number): string {
+  if (score >= 75) return 'shadow-emerald-500/30';
+  if (score >= 45) return 'shadow-amber-500/30';
+  return 'shadow-red-500/30';
+}
+
+// --- CSS-only fallback when WebGL is unavailable ---
+function CSSFallbackSphere({ score, verdict }: TrustSphereProps) {
+  return (
+    <div className="w-full h-[300px] sm:h-[350px] flex flex-col items-center justify-center gap-4">
+      <div
+        className={`relative w-36 h-36 rounded-full border-4 ${getTailwindBorder(score)} shadow-lg ${getTailwindShadow(score)} flex items-center justify-center animate-pulse`}
+      >
+        <div
+          className={`w-28 h-28 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center border ${getTailwindBorder(score)}`}
+        >
+          <span className={`text-4xl font-bold ${getTailwindColor(score)}`}>{score}</span>
+        </div>
+      </div>
+      <span className={`text-sm font-medium ${getTailwindColor(score)}`}>{verdict}</span>
+    </div>
+  );
+}
+
+// --- Error boundary to catch WebGL crashes ---
+interface ErrorBoundaryProps { fallback: ReactNode; children: ReactNode }
+interface ErrorBoundaryState { hasError: boolean }
+
+class WebGLErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error: Error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[trust-sphere] WebGL error, falling back to CSS:', error.message);
+    }
+  }
+  render() {
+    if (this.state.hasError) return this.props.fallback;
+    return this.props.children;
+  }
+}
+
+// --- Three.js scene components ---
 
 function SphereCore({ score }: { score: number }) {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -42,7 +103,7 @@ function SphereCore({ score }: { score: number }) {
   return (
     <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.5}>
       <mesh ref={meshRef}>
-        <sphereGeometry args={[1.5, 64, 64]} />
+        <sphereGeometry args={[1.5, 32, 32]} />
         <MeshDistortMaterial
           color={color}
           emissive={emissive}
@@ -67,7 +128,7 @@ function seededRandom(seed: number): number {
 
 function ParticleRing({ score }: { score: number }) {
   const groupRef = useRef<THREE.Group>(null);
-  const particleCount = 60;
+  const particleCount = 30;
   const color = getColorFromScore(score);
 
   const positions = useMemo(() => {
@@ -91,7 +152,7 @@ function ParticleRing({ score }: { score: number }) {
     <group ref={groupRef}>
       {positions.map((pos, i) => (
         <mesh key={i} position={pos}>
-          <sphereGeometry args={[0.03, 8, 8]} />
+          <sphereGeometry args={[0.03, 6, 6]} />
           <meshBasicMaterial color={color} transparent opacity={0.6} />
         </mesh>
       ))}
@@ -99,61 +160,62 @@ function ParticleRing({ score }: { score: number }) {
   );
 }
 
-function ScoreLabel({ score, verdict }: { score: number; verdict: string }) {
-  const color = getColorFromScore(score);
-
-  return (
-    <group position={[0, -2.5, 0]}>
-      <Text
-        fontSize={0.4}
-        color={color}
-        anchorX="center"
-        anchorY="middle"
-      >
-        {score}
-      </Text>
-      <Text
-        position={[0, -0.5, 0]}
-        fontSize={0.18}
-        color="#9ca3af"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {verdict}
-      </Text>
-    </group>
-  );
+// --- Detect WebGL support ---
+function supportsWebGL(): boolean {
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(canvas.getContext('webgl2') || canvas.getContext('webgl'));
+  } catch {
+    return false;
+  }
 }
 
 export function TrustSphere({ score, verdict }: TrustSphereProps) {
+  const [webglOk, setWebglOk] = useState(() => supportsWebGL());
+
+  const fallback = <CSSFallbackSphere score={score} verdict={verdict} />;
+
+  if (!webglOk) return fallback;
+
   return (
-    <div className="w-full h-[300px] sm:h-[350px]">
-      <Canvas
-        camera={{ position: [0, 0, 5], fov: 50 }}
-        gl={{ antialias: true, alpha: true }}
-        style={{ background: 'transparent' }}
-      >
-        <ambientLight intensity={0.3} />
-        <pointLight position={[5, 5, 5]} intensity={1} color="#ffffff" />
-        <pointLight
-          position={[-3, -3, 2]}
-          intensity={0.5}
-          color={getColorFromScore(score)}
-        />
+    <WebGLErrorBoundary fallback={fallback}>
+      <div className="w-full h-[300px] sm:h-[350px]">
+        <Canvas
+          camera={{ position: [0, 0, 5], fov: 50 }}
+          gl={{ antialias: true, alpha: true, powerPreference: 'low-power' }}
+          style={{ background: 'transparent' }}
+          onCreated={({ gl }) => {
+            const canvas = gl.domElement;
+            canvas.addEventListener('webglcontextlost', (e) => {
+              e.preventDefault();
+              if (process.env.NODE_ENV === 'development') {
+                console.warn('[trust-sphere] WebGL context lost');
+              }
+              setWebglOk(false);
+            });
+          }}
+        >
+          <ambientLight intensity={0.3} />
+          <pointLight position={[5, 5, 5]} intensity={1} color="#ffffff" />
+          <pointLight
+            position={[-3, -3, 2]}
+            intensity={0.5}
+            color={getColorFromScore(score)}
+          />
 
-        <SphereCore score={score} />
-        <ParticleRing score={score} />
-        <ScoreLabel score={score} verdict={verdict} />
+          <SphereCore score={score} />
+          <ParticleRing score={score} />
 
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          autoRotate
-          autoRotateSpeed={0.5}
-          maxPolarAngle={Math.PI / 1.5}
-          minPolarAngle={Math.PI / 3}
-        />
-      </Canvas>
-    </div>
+          <OrbitControls
+            enableZoom={false}
+            enablePan={false}
+            autoRotate
+            autoRotateSpeed={0.5}
+            maxPolarAngle={Math.PI / 1.5}
+            minPolarAngle={Math.PI / 3}
+          />
+        </Canvas>
+      </div>
+    </WebGLErrorBoundary>
   );
 }
