@@ -44,13 +44,33 @@ export const addRestaurant = mutation({
       createdAt: Date.now(),
     });
 
-    // Create a community reviewer profile for this user
-    const reviewerId = await ctx.db.insert("reviewers", {
-      name: user.name,
-      totalReviews: 1,
-      accountAge: Math.floor((Date.now() - user.createdAt) / (24 * 60 * 60 * 1000)),
-      suspiciousScore: 10,
-    });
+    // Find or create a community reviewer profile for this user
+    // Check if user already has reviews (and thus a reviewer profile)
+    const userReviews = await ctx.db
+      .query("reviews")
+      .withIndex("by_user_restaurant", (q) => q.eq("addedByUserId", args.userId))
+      .first();
+
+    let reviewerId;
+    if (userReviews) {
+      // Reuse existing reviewer profile
+      reviewerId = userReviews.reviewerId;
+      const reviewer = await ctx.db.get(reviewerId);
+      if (reviewer) {
+        await ctx.db.patch(reviewerId, {
+          totalReviews: reviewer.totalReviews + 1,
+          accountAge: Math.floor((Date.now() - user.createdAt) / (24 * 60 * 60 * 1000)),
+        });
+      }
+    } else {
+      // Create new reviewer profile for first-time reviewer
+      reviewerId = await ctx.db.insert("reviewers", {
+        name: user.name,
+        totalReviews: 1,
+        accountAge: Math.floor((Date.now() - user.createdAt) / (24 * 60 * 60 * 1000)),
+        suspiciousScore: 10,
+      });
+    }
 
     // Insert the initial review
     await ctx.db.insert("reviews", {
@@ -131,10 +151,16 @@ export const addReview = mutation({
     }
 
     // Find or create reviewer profile for this user
+    // Look for ANY review by this user to get their reviewer profile
+    const anyUserReview = await ctx.db
+      .query("reviews")
+      .withIndex("by_user_restaurant", (q) => q.eq("addedByUserId", args.userId))
+      .first();
+
     let reviewerId;
-    if (existingReviews.length > 0) {
-      // Reuse the same reviewer profile
-      reviewerId = existingReviews[0].reviewerId;
+    if (anyUserReview) {
+      // Reuse existing reviewer profile from any previous review
+      reviewerId = anyUserReview.reviewerId;
       const reviewer = await ctx.db.get(reviewerId);
       if (reviewer) {
         await ctx.db.patch(reviewerId, {
@@ -143,7 +169,7 @@ export const addReview = mutation({
         });
       }
     } else {
-      // Create new reviewer profile
+      // Create new reviewer profile for first-time reviewer
       reviewerId = await ctx.db.insert("reviewers", {
         name: user.name,
         totalReviews: 1,
