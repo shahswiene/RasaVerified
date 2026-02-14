@@ -33,10 +33,13 @@ export function Navbar() {
                   <Plus className="w-3.5 h-3.5" />
                   Add Restaurant
                 </button>
-                <div className="flex items-center gap-2 text-sm text-gray-400">
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-2 text-sm text-gray-400 hover:text-emerald-300 transition-colors"
+                >
                   <User className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">{user.name}</span>
-                </div>
+                </Link>
                 <button
                   onClick={logout}
                   className="flex items-center gap-1 px-3 py-1.5 text-xs rounded-full border border-white/10 text-gray-400 hover:text-white hover:border-white/20 transition-all"

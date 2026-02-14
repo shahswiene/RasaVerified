@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import type { Id } from '../../convex/_generated/dataModel';
@@ -17,6 +17,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
+  updateUser: (updates: Partial<Pick<User, 'name'>>) => void;
   error: string | null;
   clearError: () => void;
 }
@@ -24,12 +25,19 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    if (typeof window === 'undefined') return null;
-    const stored = localStorage.getItem('rasaverified_user');
-    return stored ? JSON.parse(stored) : null;
-  });
-  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Hydrate from localStorage after mount to avoid SSR mismatch
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('rasaverified_user');
+      if (stored) setUser(JSON.parse(stored));
+    } catch {
+      localStorage.removeItem('rasaverified_user');
+    }
+    setIsLoading(false);
+  }, []);
   const [error, setError] = useState<string | null>(null);
 
   const loginMutation = useMutation(api.auth.login);
@@ -83,10 +91,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const updateUser = useCallback((updates: Partial<Pick<User, 'name'>>) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev, ...updates };
+      localStorage.setItem('rasaverified_user', JSON.stringify(updated));
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[auth] User updated:', updates);
+      }
+      return updated;
+    });
+  }, []);
+
   const clearError = useCallback(() => setError(null), []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout, error, clearError }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout, updateUser, error, clearError }}>
       {children}
     </AuthContext.Provider>
   );

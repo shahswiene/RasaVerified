@@ -78,3 +78,42 @@ export const getUser = query({
     return { _id: user._id, name: user.name, email: user.email, createdAt: user.createdAt };
   },
 });
+
+export const updateName = mutation({
+  args: {
+    userId: v.id("users"),
+    name: v.string(),
+  },
+  handler: async (ctx, { userId, name }) => {
+    console.log(`[auth] Update name for user=${userId}`);
+    const user = await ctx.db.get(userId);
+    if (!user) throw new Error("User not found");
+
+    await ctx.db.patch(userId, { name });
+    return { userId: user._id, name, email: user.email };
+  },
+});
+
+export const updatePassword = mutation({
+  args: {
+    userId: v.id("users"),
+    currentPassword: v.string(),
+    newPassword: v.string(),
+  },
+  handler: async (ctx, { userId, currentPassword, newPassword }) => {
+    console.log(`[auth] Update password for user=${userId}`);
+    const user = await ctx.db.get(userId);
+    if (!user) throw new Error("User not found");
+
+    // Verify current password
+    const currentHash = await simpleHash(currentPassword);
+    if (user.passwordHash !== currentHash) {
+      throw new Error("Current password is incorrect");
+    }
+
+    const newHash = await simpleHash(newPassword);
+    await ctx.db.patch(userId, { passwordHash: newHash });
+    console.log(`[auth] Password updated for user=${userId}`);
+    return { success: true };
+  },
+});

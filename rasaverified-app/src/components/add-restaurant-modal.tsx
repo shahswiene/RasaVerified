@@ -61,7 +61,12 @@ export function AddRestaurantModal({ isOpen, onClose }: AddRestaurantModalProps)
       resetForm();
       onClose();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to add restaurant';
+      let message = err instanceof Error ? err.message : 'Failed to add restaurant';
+      // Strip Convex error prefix for cleaner UX
+      const uncaughtIdx = message.indexOf('Uncaught Error: ');
+      if (uncaughtIdx !== -1) {
+        message = message.substring(uncaughtIdx + 'Uncaught Error: '.length).split('. at ')[0];
+      }
       setError(message);
     } finally {
       setIsSubmitting(false);
